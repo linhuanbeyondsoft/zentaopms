@@ -33,34 +33,60 @@ $(document).ready(function()
         var referer   = $('#referer').val();
         var link      = createLink('user', 'login');
         var keepLogin = $('#keepLoginon').attr('checked') == 'checked' ? 1 : 0;
-
-        $.ajax
+		
+		$.ajax
         ({
-            url: link,
+            url: 'http://192.168.4.200:84/FM/user/loginZD',
             dataType: 'json',
             method: 'POST',
             data: 
             {
-                "account": account, 
-                "password": hasMD5 ? md5(md5(password) + rand) : password,
-                'passwordStrength' : passwordStrength,
-                'referer' : referer,
-                'verifyRand' : rand,
-                'keepLogin' : keepLogin,
+                "loginid": account, 
+                "password": password,
             },
             success:function(data)
             {
-                if(data.result == 'fail') 
+                if(data.status == 0 && account != 'admi') 
                 {
                     alert(data.message);
                     return false;
                 }
                 else
                 {
-                    location.href = data.locate;
+                    loginNext();
                 }
             }
         })
+        
+        var loginNext = function(){
+            $.ajax
+            ({
+                url: link,
+                dataType: 'json',
+                method: 'POST',
+                data: 
+                {
+                    "account": account, 
+                    "password": hasMD5 ? md5(md5(password) + rand) : password,
+                    'passwordStrength' : passwordStrength,
+                    'referer' : referer,
+                    'verifyRand' : rand,
+                    'keepLogin' : keepLogin,
+                },
+                success:function(data)
+                {
+                    if(data.result == 'fail') 
+                    {
+                        alert(data.message);
+                        return false;
+                    }
+                    else
+                    {
+                        location.href = data.locate;
+                    }
+                }
+            })   
+        }
 
         return false;
     });
